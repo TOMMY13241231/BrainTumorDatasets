@@ -150,33 +150,6 @@ The four classification labels are:
 3: pituitary
 ```
 
-## Associated method
-
-The dataset was prepared for a two-stage segmentation-guided classification framework:
-
-1. **Tumor localization**  
-   A SAM2-UNet model is trained on `dataset1` to predict binary tumor masks.
-
-2. **Segmentation-guided classification**  
-   For each classification image, the predicted mask is concatenated with a replicated grayscale MRI image to form a four-channel input:
-
-   ```text
-   [MRI, MRI, MRI, predicted_mask]
-   ```
-
-3. **Four-class prediction**  
-   A modified ResNet50 classifier predicts one of four categories: glioma, meningioma, no tumor, or pituitary tumor.
-
-In the manuscript, the aligned binary-mask model achieved:
-
-| Metric | Result |
-|---|---:|
-| Accuracy | 99.16 ± 0.25% |
-| Macro F1-score | 99.11 ± 0.24% |
-| Macro AUC | 99.70 ± 0.18% |
-
-These results are reported as benchmark-level evidence and should not be interpreted as clinical readiness.
-
 ## Download
 
 Clone the repository:
@@ -184,31 +157,6 @@ Clone the repository:
 ```bash
 git clone https://github.com/TOMMY13241231/BrainTumorDatasets.git
 cd BrainTumorDatasets
-```
-
-## Recommended data loading example
-
-```python
-from pathlib import Path
-from PIL import Image
-
-root = Path("BrainTumorDatasets")
-
-# Example: load classification images
-split = "Training"
-class_name = "glioma"
-img_paths = sorted((root / "dataset2_clean" / split / class_name).glob("*.jpg"))
-
-img = Image.open(img_paths[0]).convert("L")
-print(img.size, class_name)
-
-# Example: load MRI-mask pair from dataset1
-mri_path = root / "dataset1" / "glioma" / "1841_mri.jpg"
-mask_path = root / "dataset1" / "glioma" / "1841_mask.jpg"
-
-mri = Image.open(mri_path).convert("L")
-mask = Image.open(mask_path).convert("L")
-print(mri.size, mask.size)
 ```
 
 ## Data sources
@@ -220,28 +168,3 @@ Please cite and respect the original data sources:
 
 2. Nickparvar, M. **Brain Tumor MRI Dataset**. Kaggle.  
    https://www.kaggle.com/datasets/masoudnickparvar/brain-tumor-mri-dataset
-
-## Citation
-
-If you use this repository, please cite the associated manuscript and the original dataset sources.
-
-```bibtex
-@misc{chen2026segmentationprior,
-  title  = {Segmentation-Prior-Guided Brain Tumor MRI Classification via SAM2-UNet and Four-Channel ResNet50},
-  author = {Chen, Wenjie and Yang, Zheng and Wu, Yingjie and Wang, Ziwen},
-  year   = {2026},
-  note   = {Manuscript and dataset repository}
-}
-```
-
-## Limitations and disclaimer
-
-- This repository is intended for research and educational use.
-- The dataset consists of 2D MRI slices and does not provide complete clinical metadata.
-- Complete patient-level independence for the Kaggle-derived classification set cannot be guaranteed because consistent patient identifiers are unavailable.
-- The cleaned dataset reduces duplicate and near-duplicate leakage but should not be treated as a clinical validation cohort.
-- Models trained on this dataset are not intended for direct clinical diagnosis without further multi-center, patient-level external validation.
-
-## License
-
-No repository license has been specified at the time of writing. Before redistributing or using the data, please check the licenses and terms of the original Figshare and Kaggle datasets, and add an appropriate `LICENSE` file to this repository if needed.
